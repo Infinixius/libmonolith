@@ -18,7 +18,7 @@ pub use monolith::opts::Options;
 use monolith::url::{create_data_url, resolve_url};
 use monolith::utils::retrieve_asset;
 
-pub fn monolith(mut options: Options) -> io::Result<Vec<u8>> {
+pub fn monolith(input_data: Option<&[u8]>, mut options: Options) -> io::Result<Vec<u8>> {
     // Check if target was provided
     if options.target.len() == 0 {
         return Err(io::Error::new(io::ErrorKind::InvalidInput, "No target URL or file provided"));
@@ -32,6 +32,13 @@ pub fn monolith(mut options: Options) -> io::Result<Vec<u8>> {
     }
 
     let target_url = match options.target.as_str() {
+        "-" => {
+            if input_data.is_some() {
+                Url::parse("data:text/html,").unwrap()
+            } else {
+                return Err(io::Error::new(io::ErrorKind::InvalidInput, "No input data provided"));
+            }
+        }
         target => match Url::parse(&target) {
             Ok(url) => match url.scheme() {
                 "data" | "file" | "http" | "https" => url,
@@ -123,7 +130,9 @@ pub fn monolith(mut options: Options) -> io::Result<Vec<u8>> {
     let mut dom: RcDom;
 
     // Retrieve target document
-    if target_url.scheme() == "file" || (target_url.scheme() == "http" || target_url.scheme() == "https") || target_url.scheme() == "data" {
+    if let Some(input_data) = input_data {
+        data = input_data.to_vec();
+    } else if target_url.scheme() == "file" || (target_url.scheme() == "http" || target_url.scheme() == "https") || target_url.scheme() == "data" {
         match retrieve_asset(&mut cache, &client, &target_url, &target_url, &options) {
             Ok((retrieved_data, final_url, media_type, charset)) => {
                 // Provide output as text without processing it, the way browsers do
