@@ -14,7 +14,7 @@ use monolith::html::{
     add_favicon, create_metadata_tag, get_base_url, get_charset, has_favicon, html_to_dom,
     serialize_document, set_base_url, set_charset, walk_and_embed_assets,
 };
-use monolith::opts::Options;
+pub use monolith::opts::Options;
 use monolith::url::{create_data_url, resolve_url};
 use monolith::utils::retrieve_asset;
 
