@@ -3,7 +3,7 @@ name = "libmonolith"
 description = "A wrapper to use the monolith crate as a library"
 repository = "https://github.com/infinixius/libmonolith"
 license = "MIT"
-version = "0.1.0"
+version = "0.2.0"
 edition = "2021"
 
 [dependencies]
